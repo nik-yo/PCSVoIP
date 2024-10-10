@@ -1,5 +1,3 @@
-import bgImage from '../public/slide-1.jpg'
-
 export default function Home() {
   return (
     <div className="bg-[url('/slide-1.jpg')] h-96 flex items-center justify-center">

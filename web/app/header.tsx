@@ -22,7 +22,7 @@ export default function Header() {
     {
       icon: faMapMarkerAlt,
       display: 'Olathe, KS 66062',
-      href: '#'
+      href: 'https://www.google.com/search?q=1948+E+Santa+Fe+Olathe+Kansas+%E2%80%93+66062&rlz=1C1CHBF_enUS945US945&oq=1948+E+Santa+Fe+Olathe+Kansas+%E2%80%93+66062'
     },
     {
       icon: faEnvelope,
@@ -106,7 +106,7 @@ export default function Header() {
             {
               showTopBarMenu &&
               <div className="absolute text-black bg-white top-8 -left-4">
-                <div className="flex flex-col gap-2 divide-y shadow">
+                <div className="flex flex-col divide-y shadow">
                   {
                     contacts.map((c, i) => (
                       <Link key={`c-${i}`} href={c.href} 
@@ -114,7 +114,7 @@ export default function Header() {
                         onMouseLeave={() => {if (i == 0) {setShowAltPhone(false)}}}
                         className="flex flex-row gap-2 items-center px-4 py-2">
                         <FontAwesomeIcon icon={c.icon} className="size-4"/>
-                        <label className="text-xs">{i == 0 && showAltPhone ? c.altDisplay : c.display}</label>                 
+                        <label className="text-xs cursor-pointer">{i == 0 && showAltPhone ? c.altDisplay : c.display}</label>                 
                       </Link>
                     ))
                   }
@@ -139,7 +139,7 @@ export default function Header() {
                 onMouseLeave={() => {if (i == 0) {setShowAltPhone(false)}}}
                 className="flex flex-row gap-2 items-center">
                 <FontAwesomeIcon icon={c.icon} className="size-4"/>
-                <label className="text-xs hidden lg:inline">{i == 0 && showAltPhone ? c.altDisplay : c.display}</label>                 
+                <label className="text-xs hidden lg:inline cursor-pointer">{i == 0 && showAltPhone ? c.altDisplay : c.display}</label>                 
               </Link>
             ))
           }
@@ -163,11 +163,11 @@ export default function Header() {
             </button>
             {
               showLoginMenu &&
-              <div className="absolute top-12 -left-4 text-black w-52 shadow bg-white">
+              <div className="absolute top-12 -left-4 text-black w-52 shadow bg-white z-20">
                 <ul className="divide-y">
                   {
                     loginMenu.map((l, i) => (
-                      <li className="py-2 px-4"><Link href={l.href}>{l.title}</Link></li>
+                      <li key={`l-${i}`} className="py-2 px-4"><Link href={l.href}>{l.title}</Link></li>
                     ))
                   }
                 </ul>
@@ -181,7 +181,7 @@ export default function Header() {
       </div>
       <div className="container mx-auto text-sm flex flex-col md:flex-row justify-between items-center gap-4 md:gap-12 my-4">
         <div>
-          <img src="PCSlogo_color_right-300x127.png" alt="PCSVoIP logo" className="h-24" />
+          <img src="PCSlogo_color_right-300x127.png" alt="PCSVoIP logo" className="h-24 min-w-fit" />
         </div>
         <div className="flex flex-col lg:hidden items-center relative gap-2 w-full">
           <button className="flex flex-row gap-2 items-center font-bold"
@@ -191,7 +191,7 @@ export default function Header() {
           </button>          
           {
             showMenu &&
-            <div className="text-left divide-y border-[1px] relative w-full">
+            <div className="text-left divide-y border-[1px] relative w-full md:absolute md:top-8 bg-white z-10">
               {
                 links.map((l, i) => (
                   <div key={`l-${i}`} className="px-4 py-2">
