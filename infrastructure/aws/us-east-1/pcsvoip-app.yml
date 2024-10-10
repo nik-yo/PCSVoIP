@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  PcsVoipS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: pcsvoip-app
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        ErrorDocument: index.html
+        IndexDocument: index.html
+
+  PcsVoipS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: !Ref PcsVoipS3Bucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+            - s3:GetObject
+            Effect: Allow
+            Resource: !Sub 
+              - 'arn:aws:s3:::${BucketName}/*'
+              - BucketName: !Ref PcsVoipS3Bucket
+            Principal: '*'
+
+  # PcsVoipOAC:
+  #   Type: AWS::CloudFront::OriginAccessControl
+  #   Properties:
+  #     OriginAccessControlConfig:
+  #         Name: asylosoft-app-nikkiyodo
+  #         OriginAccessControlOriginType: s3
+  #         SigningBehavior: always
+  #         SigningProtocol: sigv4
+
+  PcsVoipCloudFrontCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties: 
+      CachePolicyConfig: 
+        DefaultTTL: 300 # 86400
+        MaxTTL: 300 # 31536000
+        MinTTL: 300
+        Name: pcsvoip-app-cache-policy
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig: 
+            CookieBehavior: none
+          EnableAcceptEncodingBrotli: false
+          EnableAcceptEncodingGzip: false
+          HeadersConfig: 
+            HeaderBehavior: none
+          QueryStringsConfig: 
+            QueryStringBehavior: none
+
+  PcsVoipCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties: 
+      DistributionConfig:
+        Aliases:
+          - pcsvoip.mockup.nikyotech.com
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+        DefaultCacheBehavior:
+          CachePolicyId: !Ref PcsVoipCloudFrontCachePolicy
+          TargetOriginId: !Ref PcsVoipS3Bucket
+          ViewerProtocolPolicy: redirect-to-https
+        Enabled: true
+        Origins:
+          - CustomOriginConfig:
+              OriginProtocolPolicy: http-only
+            DomainName: !Sub
+              - '${BucketName}.s3-website.${AWS::Region}.amazonaws.com'
+              - BucketName: !Ref PcsVoipS3Bucket
+            Id: !Ref PcsVoipS3Bucket
+            # OriginAccessControlId: !Ref PcsVoipOAC
+        ViewerCertificate: 
+          AcmCertificateArn: !Ref PcsVoipCertificate
+          MinimumProtocolVersion: TLSv1.2_2021
+          SslSupportMethod: sni-only
+
+  PcsVoipCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: pcsvoip.mockup.nikyotech.com
+      ValidationMethod: DNS
+
+Outputs:
+  PcsVoipCloudFrontDomainNameOutput:
+    Value: !GetAtt PcsVoipCloudFrontDistribution.DomainName
+    Export:
+      Name: PcsVoipCloudFrontDomainName
